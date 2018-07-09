@@ -41,7 +41,7 @@
 
 		<!-- Spring -->
 		<spring-framework.version>5.0.2.RELEASE</spring-framework.version>
-		<spring-data.version>2.0.8.RELEASE</spring-data.version>
+		<spring-data.version>2.1.0.BUILD-SNAPSHOT</spring-data.version>
 		
 		<cdi.version>1.0</cdi.version>
 		<lombok.version>1.18.0</lombok.version>

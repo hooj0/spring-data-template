@@ -2,17 +2,34 @@ package io.github.hooj0.springdata.template.repository.support;
 
 import static org.springframework.data.querydsl.QuerydslUtils.QUERY_DSL_PRESENT;
 
+import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.mapping.context.MappingContext;
+import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.core.EntityInformation;
+import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
+import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.repository.query.QueryLookupStrategy.Key;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
+import org.springframework.data.repository.query.RepositoryQuery;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.Assert;
 
 import io.github.hooj0.springdata.template.core.TemplateOperations;
+import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity;
+import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 import io.github.hooj0.springdata.template.repository.TemplateRepository;
+import io.github.hooj0.springdata.template.repository.query.PartTreeTemplateQuery;
+import io.github.hooj0.springdata.template.repository.query.StringBasedTemplateQuery;
+import io.github.hooj0.springdata.template.repository.query.TemplatePartQuery;
+import io.github.hooj0.springdata.template.repository.query.TemplateQueryMethod;
+import io.github.hooj0.springdata.template.repository.query.TemplateStringQuery;
 
 /**
  * <b>function:</b> 通过 TemplateRepositoryFactory 创建 {@link TemplateRepository} 实例
@@ -27,6 +44,8 @@ import io.github.hooj0.springdata.template.repository.TemplateRepository;
  */
 public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 
+	private static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+	
 	private final TemplateOperations operations;
 	private final TemplateEntityInformationCreator entityInformationCreator;
 	
@@ -90,5 +109,60 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 	 */
 	private static boolean isQueryDslRepository(Class<?> repositoryInterface) {
 		return QUERY_DSL_PRESENT && QuerydslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
+	}
+	
+	@Override
+	protected Optional<QueryLookupStrategy> getQueryLookupStrategy(Key key, QueryMethodEvaluationContextProvider evaluationContextProvider) {
+		
+		Optional.of(new TemplatesQueryLookupStrategy(operations, evaluationContextProvider, operations.getTemplateConverter().getMappingContext()));
+		return Optional.of(new TemplateQueryLookupStrategy());
+	}
+
+	private class TemplateQueryLookupStrategy implements QueryLookupStrategy {
+
+		@Override
+		public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, ProjectionFactory factory, NamedQueries namedQueries) {
+
+			TemplateQueryMethod queryMethod = new TemplateQueryMethod(method, metadata, factory);
+			String namedQueryName = queryMethod.getNamedQueryName();
+
+			if (namedQueries.hasQuery(namedQueryName)) {
+				String namedQuery = namedQueries.getQuery(namedQueryName);
+				return new TemplateStringQuery(queryMethod, operations, namedQuery);
+			} else if (queryMethod.hasAnnotatedQuery()) {
+				return new TemplateStringQuery(queryMethod, operations, queryMethod.getAnnotatedQuery());
+			}
+			return new TemplatePartQuery(queryMethod, operations);
+		}
+	}
+	
+	private class TemplatesQueryLookupStrategy implements QueryLookupStrategy {
+
+		private final QueryMethodEvaluationContextProvider evaluationContextProvider;
+		private final MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext;
+		private final TemplateOperations operations;
+		
+		TemplatesQueryLookupStrategy(TemplateOperations operations, QueryMethodEvaluationContextProvider evaluationContextProvider, MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext) {
+			this.operations = operations;
+			this.evaluationContextProvider = evaluationContextProvider;
+			this.mappingContext = mappingContext;
+		}
+
+		@Override
+		public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, ProjectionFactory factory,
+				NamedQueries namedQueries) {
+
+			TemplateQueryMethod queryMethod = new TemplateQueryMethod(method, metadata, factory, mappingContext);
+			String namedQueryName = queryMethod.getNamedQueryName();
+
+			if (namedQueries.hasQuery(namedQueryName)) {
+				String namedQuery = namedQueries.getQuery(namedQueryName);
+				return new StringBasedTemplateQuery(namedQuery, queryMethod, operations, EXPRESSION_PARSER, evaluationContextProvider);
+			} else if (queryMethod.hasAnnotatedQuery()) {
+				return new StringBasedTemplateQuery(queryMethod, operations, EXPRESSION_PARSER, evaluationContextProvider);
+			} else {
+				return new PartTreeTemplateQuery(queryMethod, operations);
+			}
+		}
 	}
 }

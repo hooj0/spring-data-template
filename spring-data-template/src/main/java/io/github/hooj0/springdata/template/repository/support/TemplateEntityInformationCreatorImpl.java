@@ -3,6 +3,7 @@ package io.github.hooj0.springdata.template.repository.support;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.util.Assert;
 
+import io.github.hooj0.springdata.template.core.convert.MappingTemplateConverter;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 
@@ -35,6 +36,6 @@ public class TemplateEntityInformationCreatorImpl implements TemplateEntityInfor
 		Assert.notNull(persistentEntity, String.format("Unable to obtain mapping metadata for %s!", domainClass));
 		Assert.notNull(persistentEntity.getIdProperty(), String.format("No id property found for %s!", domainClass));
 
-		return new MappingTemplateEntityInformation<>(persistentEntity);
+		return new MappingTemplateEntityInformation<>(persistentEntity, new MappingTemplateConverter(mappingContext));
 	}
 }

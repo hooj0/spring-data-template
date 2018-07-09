@@ -22,7 +22,7 @@ public interface TemplateRepository<T, ID extends Serializable> extends Reposito
 
 	boolean invoke(String... args);
 	
-	String query(String param);
+	String query(String params);
 	
 	void refresh();
 	

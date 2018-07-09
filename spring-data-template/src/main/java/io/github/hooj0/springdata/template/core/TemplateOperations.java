@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.util.CloseableIterator;
 
 import io.github.hooj0.springdata.template.core.convert.TemplateConverter;
+import io.github.hooj0.springdata.template.core.query.CriteriaQuery;
+import io.github.hooj0.springdata.template.core.query.StringQuery;
 
 /**
  * <b>function:</b> 定义一些 “模板” 通用的操作接口：如增删改查、或其他诸如增删改查相关的方法。
@@ -46,4 +49,24 @@ public interface TemplateOperations {
 	<T> List<T> list(Object entity);
 	
 	<T> Page<T> queryForPage(Object entity, Class<T> classes);
+	
+	<S> S index(S entity);
+	
+	boolean invoke(String... args);
+	
+	String query(String params);
+
+	Object queryForList(StringQuery stringQuery, Class<?> javaType);
+
+	Object queryForObject(StringQuery stringQuery, Class<?> javaType);
+
+	void delete(CriteriaQuery query, Class<?> javaType);
+
+	CloseableIterator<Object> stream(CriteriaQuery query, Class<?> entityType);
+
+	int count(CriteriaQuery query, Class<?> javaType);
+
+	Object queryForList(CriteriaQuery query, Class<?> javaType);
+
+	Object queryForObject(CriteriaQuery query, Class<?> javaType);
 }

@@ -8,15 +8,14 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
-import org.springframework.data.cassandra.core.CassandraOperations;
-import org.springframework.data.cassandra.repository.support.CassandraRepositoryFactory;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.repository.cdi.CdiRepositoryBean;
 import org.springframework.data.repository.config.CustomRepositoryImplementationDetector;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import io.github.hooj0.springdata.template.core.TemplateOperations;
 import io.github.hooj0.springdata.template.repository.TemplateRepository;
+import io.github.hooj0.springdata.template.repository.support.TemplateRepositoryFactory;
 
 /**
  * 使用 CdiRepositoryBean 创建 {@link TemplateRepository } 实例
@@ -33,8 +32,8 @@ public class TemplateRepositoryBean<T> extends CdiRepositoryBean<T> {
 
 	private final Bean<TemplateOperations> templateOperationsBean;
 	
-	public TemplateRepositoryBean(Bean<TemplateOperations> operations, Set<Annotation> qualifiers, Class<T> repositoryType, BeanManager beanManager, Optional<CustomRepositoryImplementationDetector> detector) {
-		super(qualifiers, repositoryType, beanManager, detector);
+	public TemplateRepositoryBean(Bean<TemplateOperations> operations, Set<Annotation> qualifiers, Class<T> repositoryType, BeanManager beanManager, @Nullable CustomRepositoryImplementationDetector detector) {
+		super(qualifiers, repositoryType, beanManager, Optional.of(detector));
 		
 		Assert.notNull(operations, "Cannot create repository with 'null' for TemplateOperations.");
 		this.templateOperationsBean = operations;
@@ -47,10 +46,9 @@ public class TemplateRepositoryBean<T> extends CdiRepositoryBean<T> {
 
 		return create(() -> new TemplateRepositoryFactory(templateOperations), repositoryType);
 	}
-
+	
 	@Override
 	public Class<? extends Annotation> getScope() {
 		return templateOperationsBean.getScope();
 	}
-
 }

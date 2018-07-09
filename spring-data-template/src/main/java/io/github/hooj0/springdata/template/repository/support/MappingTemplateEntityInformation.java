@@ -1,7 +1,9 @@
 package io.github.hooj0.springdata.template.repository.support;
 
+import org.springframework.data.repository.core.support.PersistentEntityInformation;
 import org.springframework.util.Assert;
 
+import io.github.hooj0.springdata.template.core.convert.TemplateConverter;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 
@@ -16,25 +18,28 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProper
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class MappingTemplateEntityInformation<T, ID> extends AbstractEntityInformation<T, ID> implements TemplateEntityInformation<T, ID> {
+public class MappingTemplateEntityInformation<T, ID> extends PersistentEntityInformation<T, ID> implements TemplateEntityInformation<T, ID> {
+
 
 	private final TemplatePersistentEntity<T> entityMetadata;
+	private final TemplateConverter converter;
 	
 	private String indexName;
 	
-	public MappingTemplateEntityInformation(TemplatePersistentEntity<T> entity) {
-		super(entity);
-		
-		this.entityMetadata = entity;
+	public MappingTemplateEntityInformation(TemplatePersistentEntity<T> entity, TemplateConverter converter) {
+		this(entity, entity.getName(), converter);
 	}
 	
-	public MappingTemplateEntityInformation(TemplatePersistentEntity<T> entity, String indexName) {
+	public MappingTemplateEntityInformation(TemplatePersistentEntity<T> entity, String indexName, TemplateConverter converter) {
 		super(entity);
-
+		
 		Assert.notNull(indexName, "IndexName must not be null!");
 
 		this.entityMetadata = entity;
 		this.indexName = indexName;
+		this.converter = converter;
+
+		Assert.notNull(this.converter, "converter must not be null!");
 	}
 
 	@Override
@@ -67,7 +72,6 @@ public class MappingTemplateEntityInformation<T, ID> extends AbstractEntityInfor
 
 	@Override
 	public String getParentId(T entity) {
-
 		TemplatePersistentProperty parentProperty = entityMetadata.getParentIdProperty();
 		
 		try {
