@@ -1,7 +1,5 @@
 package io.github.hooj0.springdata.template.repository.support;
 
-import java.io.Serializable;
-
 import io.github.hooj0.springdata.template.core.TemplateOperations;
 
 /**
@@ -15,7 +13,7 @@ import io.github.hooj0.springdata.template.core.TemplateOperations;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class SimpleTemplateRepository<T, ID extends Serializable> extends AbstractTemplateRepository<T, ID> {
+public class SimpleTemplateRepository<T, ID> extends AbstractTemplateRepository<T, ID> {
 
 	public SimpleTemplateRepository() {
 		super();
