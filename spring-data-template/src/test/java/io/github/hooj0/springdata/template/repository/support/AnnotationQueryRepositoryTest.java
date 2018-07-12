@@ -51,8 +51,11 @@ public class AnnotationQueryRepositoryTest {
 
 	@Configuration
 	@EnableTemplateRepositories(basePackageClasses = Person.class,
+	// 是否启用自定义 namedQueriesLocation 自动派生接口映射
 	//namedQueriesLocation = "classpath:META-INF/PersonRepositoryWithNamedQueries.properties",
+	// 是否发现内部接口内部类
 	considerNestedRepositories = true, 
+	// 扫描指定正则的repo
 	includeFilters = @Filter(pattern = ".*AnnotationQueryRepo", type = FilterType.REGEX))
 	public static class Config extends AbstractTemplateConfiguration {
 		
