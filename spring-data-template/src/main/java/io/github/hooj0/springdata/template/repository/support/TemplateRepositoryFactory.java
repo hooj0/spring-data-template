@@ -88,6 +88,8 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 		if (isQueryDslRepository(metadata.getRepositoryInterface())) {
 			throw new IllegalArgumentException("QueryDsl Support has not been implemented yet.");
 		}
+
+		log.debug("IdType: {}", metadata.getIdType());
 		
 		if (Integer.class.isAssignableFrom(metadata.getIdType()) || Long.class.isAssignableFrom(metadata.getIdType()) || Double.class.isAssignableFrom(metadata.getIdType())) {
 			return NumberKeyedRepository.class;
