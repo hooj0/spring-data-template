@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean name="myTplTemplate" class="io.github.hooj0.springdata.template.core.MyTplTemplate">
+        <constructor-arg name="client" value="myTplClient"/>
+    </bean>
+	
+	<!-- <repositories base-package="io.github.hooj0.springdata.template.repository"/> -->
+</beans>
