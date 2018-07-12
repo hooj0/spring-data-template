@@ -16,6 +16,9 @@ import org.springframework.data.mapping.model.Property;
 import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.util.Assert;
 
+import io.github.hooj0.springdata.template.annotations.Score;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * <b>function:</b> 持久化实体属性映射实现
  * @author hoojo
@@ -27,6 +30,7 @@ import org.springframework.util.Assert;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@Slf4j
 public class SimpleTemplatePersistentProperty extends AnnotationBasedPersistentProperty<TemplatePersistentProperty> implements TemplatePersistentProperty {
 
 	private static final Set<Class<?>> SUPPORTED_ID_TYPES = new HashSet<>();
@@ -39,14 +43,16 @@ public class SimpleTemplatePersistentProperty extends AnnotationBasedPersistentP
 	static {
 		SUPPORTED_ID_TYPES.add(String.class);
 		SUPPORTED_ID_PROPERTY_NAMES.add("id");
-		SUPPORTED_ID_PROPERTY_NAMES.add("documentId");
+		SUPPORTED_ID_PROPERTY_NAMES.add("templateId");
 	}
 	
 	public SimpleTemplatePersistentProperty(Property property, PersistentEntity<?, TemplatePersistentProperty> owner, SimpleTypeHolder simpleTypeHolder) {
 		super(property, owner, simpleTypeHolder);
 		
-		this.isScore = true; //isAnnotationPresent(Score.class);
-		
+		log.debug("property: {}, filed: {}", property.getName(), property.getField());
+
+		// score 注解的属性
+		this.isScore = isAnnotationPresent(Score.class);
 		if (isScore && !Arrays.asList(Float.TYPE, Float.class).contains(getType())) {
 			throw new MappingException(String.format("Score property %s must be either of type float or Float!", property.getName()));
 		}

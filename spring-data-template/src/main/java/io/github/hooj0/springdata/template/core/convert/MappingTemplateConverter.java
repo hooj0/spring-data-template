@@ -13,7 +13,9 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 
 /**
- * <b>function:</b> 实现模板转换器接口，载入上下文和转换服务，方便具体类型的转换器进行转换操作
+ * 实现模板转换器接口，载入上下文和转换服务，方便具体类型的转换器进行转换操作<br/>
+ * 转换属性或实体对象，可以完成复杂类型到底层类型的转换，已达到自动映射。<br/>
+ * 通过在XxxTemplate 类中注入 Converter 完成底层数据类型转换
  * @author hoojo
  * @createDate 2018年7月5日 上午11:29:09
  * @file MappingTemplateConverter.java
@@ -26,13 +28,10 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProper
 public class MappingTemplateConverter implements TemplateConverter, ApplicationContextAware {
 
 	private final MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext;
-	private final GenericConversionService conversionService;
-
-	@SuppressWarnings("unused")
+	private GenericConversionService conversionService;
 	private ApplicationContext applicationContext;
 	
 	public MappingTemplateConverter(MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext) {
-		
 		Assert.notNull(mappingContext, "MappingContext must not be null!");
 		
 		this.mappingContext = mappingContext;

@@ -2,6 +2,8 @@ package io.github.hooj0.springdata.template.annotations;
 
 import java.lang.annotation.*;
 
+import org.springframework.data.annotation.QueryAnnotation;
+
 /**
  * <b>function:</b> Query 查询注解，专门做查询的业务
  * @author hoojo
@@ -14,8 +16,11 @@ import java.lang.annotation.*;
  * @version 1.0
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+// annotated 和 method 都可用
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
 @Documented
+// 查询注解
+@QueryAnnotation
 public @interface Query {
 
 	/**
@@ -29,4 +34,11 @@ public @interface Query {
 	 * @return
 	 */
 	String name() default "";
+	
+	/**
+	 * count 查询
+	 */
+	boolean count() default false;
+	
+	boolean exists() default false;
 }

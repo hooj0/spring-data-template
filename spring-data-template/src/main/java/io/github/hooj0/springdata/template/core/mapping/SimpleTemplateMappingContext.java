@@ -9,7 +9,10 @@ import org.springframework.data.mapping.model.SimpleTypeHolder;
 import org.springframework.data.util.TypeInformation;
 
 /**
- * <b>function:</b>
+ * 用于构建映射元数据的基类，从而创建PersistentEntity和PersistentProperty的实例。<br/>
+ * 该实现使用ReentrantReadWriteLock确保PersistentEntity在从外部访问之前完全填充。<br/>
+ * 通过MappingContext能获取到当前映射实体的persistentEntity基本信息，<br/>
+ * PersistentEntity 能获取属性PersistentProperty信息 和 类型的TypeInformation。
  * @author hoojo
  * @createDate 2018年7月5日 上午10:44:05
  * @file SimpleTemplateMappingContext.java
@@ -30,7 +33,6 @@ public class SimpleTemplateMappingContext extends AbstractMappingContext<SimpleT
 
 	@Override
 	protected <T> SimpleTemplatePersistentEntity<?> createPersistentEntity(TypeInformation<T> typeInformation) {
-		
 		final SimpleTemplatePersistentEntity<T> persistentEntity = new SimpleTemplatePersistentEntity<>(typeInformation);
 		
 		if (context != null) {
@@ -41,7 +43,6 @@ public class SimpleTemplateMappingContext extends AbstractMappingContext<SimpleT
 
 	@Override
 	protected TemplatePersistentProperty createPersistentProperty(Property property, SimpleTemplatePersistentEntity<?> owner, SimpleTypeHolder simpleTypeHolder) {
-		
 		return new SimpleTemplatePersistentProperty(property, owner, simpleTypeHolder);
 	}
 }

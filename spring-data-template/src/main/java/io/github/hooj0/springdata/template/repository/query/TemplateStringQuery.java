@@ -3,13 +3,15 @@ package io.github.hooj0.springdata.template.repository.query;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.util.Assert;
 
 import io.github.hooj0.springdata.template.core.TemplateOperations;
-import io.github.hooj0.springdata.template.core.convert.DateTimeConverters;
+import io.github.hooj0.springdata.template.core.convert.DateTimeConverter;
 import io.github.hooj0.springdata.template.core.query.StringQuery;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <b>function:</b> 字符串查询repo实现
@@ -22,6 +24,7 @@ import io.github.hooj0.springdata.template.core.query.StringQuery;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@Slf4j
 public class TemplateStringQuery extends AbstractTemplateRepositoryQuery {
 
 	private static final Pattern PARAMETER_PLACEHOLDER = Pattern.compile("\\?(\\d+)");
@@ -31,13 +34,13 @@ public class TemplateStringQuery extends AbstractTemplateRepositoryQuery {
 
 	{
 		if (!conversionService.canConvert(java.util.Date.class, String.class)) {
-			conversionService.addConverter(DateTimeConverters.JavaDateConverter.INSTANCE);
+			conversionService.addConverter(DateTimeConverter.JavaDateConverter.INSTANCE);
 		}
 		if (!conversionService.canConvert(org.joda.time.ReadableInstant.class, String.class)) {
-			conversionService.addConverter(DateTimeConverters.JodaDateTimeConverter.INSTANCE);
+			conversionService.addConverter(DateTimeConverter.JodaDateTimeConverter.INSTANCE);
 		}
 		if (!conversionService.canConvert(org.joda.time.LocalDateTime.class, String.class)) {
-			conversionService.addConverter(DateTimeConverters.JodaLocalDateTimeConverter.INSTANCE);
+			conversionService.addConverter(DateTimeConverter.JodaLocalDateTimeConverter.INSTANCE);
 		}
 	}
 
@@ -50,9 +53,11 @@ public class TemplateStringQuery extends AbstractTemplateRepositoryQuery {
 	@Override
 	public Object execute(Object[] parameters) {
 		ParametersParameterAccessor accessor = new ParametersParameterAccessor(queryMethod.getParameters(), parameters);
+		log.info("execute accessor: {}", accessor);
 		
 		StringQuery stringQuery = createQuery(accessor);
-
+		log.info("query stringQuery: {}", stringQuery);
+		
 		if (queryMethod.isPageQuery()) { // page 查询
 			stringQuery.setPageable(accessor.getPageable());
 			return operations.queryForPage(stringQuery, queryMethod.getEntityInformation().getJavaType());
@@ -61,6 +66,9 @@ public class TemplateStringQuery extends AbstractTemplateRepositoryQuery {
 				stringQuery.setPageable(accessor.getPageable());
 			}
 			return operations.queryForList(stringQuery, queryMethod.getEntityInformation().getJavaType());
+		} else if (queryMethod.hasAnnotatedQuery() && StringUtils.contains(queryMethod.getNamedQueryName(), "count")) {
+			System.out.println("--->" + queryMethod.getNamedQueryName());
+			return operations.count(null, queryMethod.getEntityInformation().getJavaType());
 		}
 
 		// 对象查询
@@ -70,7 +78,7 @@ public class TemplateStringQuery extends AbstractTemplateRepositoryQuery {
 	protected StringQuery createQuery(ParametersParameterAccessor parameterAccessor) {
 		String queryString = replacePlaceholders(this.query, parameterAccessor);
 		
-		LOGGER.info("query string: {}", queryString);;
+		log.info("query string: {}", queryString);
 		
 		return new StringQuery(queryString);
 	}
@@ -96,6 +104,7 @@ public class TemplateStringQuery extends AbstractTemplateRepositoryQuery {
 			return "null";
 		}
 		
+		// 参数转换
 		if (conversionService.canConvert(parameter.getClass(), String.class)) {
 			return conversionService.convert(parameter, String.class);
 		}

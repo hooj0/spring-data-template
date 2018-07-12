@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.expression.BeanFactoryAccessor;
 import org.springframework.context.expression.BeanFactoryResolver;
+import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mapping.model.BasicPersistentEntity;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.expression.Expression;
@@ -12,6 +13,12 @@ import org.springframework.expression.ParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
+
+import io.github.hooj0.springdata.template.annotations.Field;
+import io.github.hooj0.springdata.template.annotations.Model;
+import io.github.hooj0.springdata.template.annotations.Score;
+import io.github.hooj0.springdata.template.annotations.Setting;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <b>function:</b> 持久化实体映射实现
@@ -24,6 +31,7 @@ import org.springframework.util.Assert;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@Slf4j
 public class SimpleTemplatePersistentEntity<T> extends BasicPersistentEntity<T, TemplatePersistentProperty> implements TemplatePersistentEntity<T>, ApplicationContextAware {
 
 	private final StandardEvaluationContext context;
@@ -33,6 +41,8 @@ public class SimpleTemplatePersistentEntity<T> extends BasicPersistentEntity<T, 
 	private String indexType;
 	private String refreshInterval;
 	private String parentType;
+	private String settingPath;
+
 	private TemplatePersistentProperty parentIdProperty;
 	private TemplatePersistentProperty scoreProperty;
 	
@@ -44,18 +54,21 @@ public class SimpleTemplatePersistentEntity<T> extends BasicPersistentEntity<T, 
 
 		// 从注解中获取数据，对entity 属性进行填充数据
 		Class<T> clazz = information.getType();
-		/*if (clazz.isAnnotationPresent(Document.class)) {
-			Document document = clazz.getAnnotation(Document.class);
-			Assert.hasText(document.indexName(), " Unknown indexName. Make sure the indexName is defined. e.g @Document(indexName=\"foo\")");
-			this.indexName = document.indexName();
-			this.indexType = hasText(document.type()) ? document.type() : clazz.getSimpleName().toLowerCase(Locale.ENGLISH);
-			this.refreshInterval = document.refreshInterval();
+		if (clazz.isAnnotationPresent(Model.class)) {
+			Model model = clazz.getAnnotation(Model.class);
+			Assert.hasText(model.indexName(), " Unknown indexName. Make sure the indexName is defined. e.g @Model(indexName=\"foo\")");
+			log.debug("@Model: {}", model);
+			
+			this.indexName = model.indexName();
+			this.indexType = model.type();
+			this.refreshInterval = model.refreshInterval();
 		}
 		
 		if (clazz.isAnnotationPresent(Setting.class)) {
-			this.settingPath = typeInformation.getType().getAnnotation(Setting.class).settingPath();
+			this.settingPath = clazz.getAnnotation(Setting.class).settingPath();
 		}
-		*/
+		
+		log.debug("indexType: {}, settingPath: {}", indexType, settingPath);
 	}
 
 	@Override
@@ -69,7 +82,7 @@ public class SimpleTemplatePersistentEntity<T> extends BasicPersistentEntity<T, 
 	public void addPersistentProperty(TemplatePersistentProperty property) {
 		super.addPersistentProperty(property);
 
-		/*Parent annotation = property.findAnnotation(Parent.class);
+		Field annotation = property.findAnnotation(Field.class);
 
 		if (annotation != null) {
 			Assert.isNull(this.parentIdProperty, "Only one field can hold a @Parent annotation");
@@ -77,15 +90,26 @@ public class SimpleTemplatePersistentEntity<T> extends BasicPersistentEntity<T, 
 			Assert.isTrue(property.getType() == String.class, "Parent ID property should be String");
 			
 			this.parentIdProperty = property;
-			this.parentType = annotation.type();
-		}*/
+			this.parentType = annotation.pattern();
+		}
 
 		if (property.isVersionProperty()) {
 			Assert.isTrue(property.getType() == Long.class, "Version property must be of type Long!");
 		}
 
+		Score annotationScore = property.findAnnotation(Score.class);
+		if (annotationScore != null) {
+			log.debug("annotationScore: {}", annotationScore);
+		}
+		
 		if (property.isScoreProperty()) {
-			System.out.println(property);
+			
+			TemplatePersistentProperty scoreProperty = this.scoreProperty;
+			if (scoreProperty != null) {
+				throw new MappingException(String.format("Attempt to add score property %s but already have property %s registered as version. Check your mapping configuration!", property.getField(), scoreProperty.getField()));
+			}
+
+			this.scoreProperty = property;
 		}
 	}
 
@@ -124,5 +148,15 @@ public class SimpleTemplatePersistentEntity<T> extends BasicPersistentEntity<T, 
 	@Override
 	public TemplatePersistentProperty getParentIdProperty() {
 		return this.parentIdProperty;
+	}
+
+	@Override
+	public String getIndexName() {
+		return this.indexName;
+	}
+
+	@Override
+	public String getIndexType() {
+		return this.indexType;
 	}
 }

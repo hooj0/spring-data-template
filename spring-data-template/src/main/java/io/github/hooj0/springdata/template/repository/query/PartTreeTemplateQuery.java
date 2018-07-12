@@ -2,17 +2,20 @@ package io.github.hooj0.springdata.template.repository.query;
 
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.query.ParameterAccessor;
+import org.springframework.data.repository.query.ParametersParameterAccessor;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.RepositoryQuery;
+import org.springframework.data.repository.query.ResultProcessor;
 import org.springframework.data.repository.query.parser.PartTree;
 
 import io.github.hooj0.springdata.template.core.TemplateOperations;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
- * PartTreeTemplateQuery extends AbstractQuery 完成PartTree类型的查询
+ * PartTreeTemplateQuery 完成用户自定义派生类型的查询
  * @author hoojo
  * @createDate 2018年7月9日 下午5:48:06
  * @file PartTreeCassandraQuery.java
@@ -22,18 +25,27 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProper
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class PartTreeTemplateQuery implements RepositoryQuery {
+@Slf4j
+public class PartTreeTemplateQuery extends AbstractTemplateRepositoryQuery implements RepositoryQuery {
 
 	private final MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext;
-
 	private final PartTree tree;
-
 	private final Object statementFactory;
+	private final TemplateQueryMethod queryMethod;
 
 	public PartTreeTemplateQuery(TemplateQueryMethod queryMethod, TemplateOperations operations) {
+		super(queryMethod, operations);
+		
+		System.out.println("===============================================================");
+		System.out.println("Method: " + queryMethod.getName());
+		System.out.println("JavaType: " + queryMethod.getEntityInformation().getJavaType());
+		System.out.println("DomainType: " + queryMethod.getResultProcessor().getReturnedType().getDomainType());
+		System.out.println("===============================================================");
+		
 		this.tree = new PartTree(queryMethod.getName(), queryMethod.getResultProcessor().getReturnedType().getDomainType());
 		this.mappingContext = operations.getTemplateConverter().getMappingContext();
 		this.statementFactory = new Object();
+		this.queryMethod = queryMethod;
 	}
 
 	/**
@@ -64,18 +76,16 @@ public class PartTreeTemplateQuery implements RepositoryQuery {
 	
 
 	protected Object createQuery(ParameterAccessor parameterAccessor) {
-
-		/*if (isCountQuery()) {
-			return getQueryStatementCreator().count(getStatementFactory(), getTree(), parameterAccessor);
+		log.debug("parameterAccessor: {}", parameterAccessor);
+		
+		if (isCountQuery()) {
+			log.info("part tree execute CountQuery({})", getStatementFactory(), getTree(), parameterAccessor);
 		}
 
 		if (isExistsQuery()) {
-			return getQueryStatementCreator().exists(getStatementFactory(), getTree(), parameterAccessor);
+			log.info("part tree execute ExistsQuery({})", getStatementFactory(), getTree(), parameterAccessor);
 		}
 
-		return getQueryStatementCreator().select(getStatementFactory(), getTree(), parameterAccessor);
-		*/
-		
 		return null;
 	}
 
@@ -91,13 +101,21 @@ public class PartTreeTemplateQuery implements RepositoryQuery {
 		return getTree().isLimiting();
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public Object execute(Object[] parameters) {
+		log.info("part tree execute({})", parameters);
+		
+		ParameterAccessor parameterAccessor = new ParametersParameterAccessor(getQueryMethod().getParameters(), parameters); 
+		ResultProcessor resultProcessor = getQueryMethod().getResultProcessor().withDynamicProjection(parameterAccessor);
+
+		createQuery(parameterAccessor);
+		
 		return null;
 	}
 
 	@Override
 	public QueryMethod getQueryMethod() {
-		return null;
+		return this.queryMethod;
 	}
 }

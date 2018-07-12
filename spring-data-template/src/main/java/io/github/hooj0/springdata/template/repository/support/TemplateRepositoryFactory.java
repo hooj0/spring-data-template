@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.core.EntityInformation;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
@@ -30,6 +29,7 @@ import io.github.hooj0.springdata.template.repository.query.StringBasedTemplateQ
 import io.github.hooj0.springdata.template.repository.query.TemplatePartQuery;
 import io.github.hooj0.springdata.template.repository.query.TemplateQueryMethod;
 import io.github.hooj0.springdata.template.repository.query.TemplateStringQuery;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <b>function:</b> 通过 TemplateRepositoryFactory 创建 {@link TemplateRepository} 实例
@@ -42,6 +42,7 @@ import io.github.hooj0.springdata.template.repository.query.TemplateStringQuery;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@Slf4j
 public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 
 	private static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
@@ -68,7 +69,7 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 	}
 	
 	@Override
-	public <T, ID> EntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
+	public <T, ID> TemplateEntityInformation<T, ID> getEntityInformation(Class<T> domainClass) {
 		return entityInformationCreator.getEntityInformation(domainClass);
 	}
 
@@ -84,7 +85,6 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 	 */
 	@Override
 	protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-		
 		if (isQueryDslRepository(metadata.getRepositoryInterface())) {
 			throw new IllegalArgumentException("QueryDsl Support has not been implemented yet.");
 		}
@@ -95,52 +95,73 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 			return SimpleTemplateRepository.class;
 		} else if (metadata.getIdType() == UUID.class) {
 			return UUIDTemplateRepository.class;
-		} else {
-			throw new IllegalArgumentException("Unsupported ID type " + metadata.getIdType());
-		}
+		} 
+		
+		throw new IllegalArgumentException("UnSupport has not been implemented yet.");
 	}
 	
 	/**
 	 * Querydsl 类型的查询 repo
 	 * @author hoojo
 	 * @createDate 2018年7月4日 下午4:47:10
-	 * @param repositoryInterface
-	 * @return
 	 */
 	private static boolean isQueryDslRepository(Class<?> repositoryInterface) {
+		log.debug("repositoryInterface: {}", repositoryInterface);
+		
 		return QUERY_DSL_PRESENT && QuerydslPredicateExecutor.class.isAssignableFrom(repositoryInterface);
 	}
 	
 	@Override
 	protected Optional<QueryLookupStrategy> getQueryLookupStrategy(Key key, QueryMethodEvaluationContextProvider evaluationContextProvider) {
+		log.debug("key: {}", key);
 		
+		//return
 		Optional.of(new TemplatesQueryLookupStrategy(operations, evaluationContextProvider, operations.getTemplateConverter().getMappingContext()));
-		return Optional.of(new TemplateQueryLookupStrategy());
+		return Optional.of(new TemplateQueryLookupStrategy(operations.getTemplateConverter().getMappingContext()));
 	}
 
+	/**
+	 * 查询查找策略
+	 */
 	private class TemplateQueryLookupStrategy implements QueryLookupStrategy {
-
+		private final MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext;
+		
+		TemplateQueryLookupStrategy(MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext) {
+			this.mappingContext = mappingContext;
+		}
+		
 		@Override
 		public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, ProjectionFactory factory, NamedQueries namedQueries) {
 
-			TemplateQueryMethod queryMethod = new TemplateQueryMethod(method, metadata, factory);
+			TemplateQueryMethod queryMethod = new TemplateQueryMethod(method, metadata, factory, mappingContext);
 			String namedQueryName = queryMethod.getNamedQueryName();
+			
+			log.debug("queryMethod.getName: {}", queryMethod.getName());
+			log.debug("queryMethod: {}", queryMethod);
+			log.debug("namedQueryName: {}", namedQueryName);
 
+			System.out.println("namedQueryName: " + namedQueryName);
+			System.out.println("RepositoryInterface: " + metadata.getRepositoryInterface().getSimpleName());
+			
 			if (namedQueries.hasQuery(namedQueryName)) {
 				String namedQuery = namedQueries.getQuery(namedQueryName);
 				return new TemplateStringQuery(queryMethod, operations, namedQuery);
 			} else if (queryMethod.hasAnnotatedQuery()) {
 				return new TemplateStringQuery(queryMethod, operations, queryMethod.getAnnotatedQuery());
 			}
+			
 			return new TemplatePartQuery(queryMethod, operations);
 		}
 	}
 	
+	/**
+	 * 查询查找策略
+	 */
 	private class TemplatesQueryLookupStrategy implements QueryLookupStrategy {
 
+		private final TemplateOperations operations;
 		private final QueryMethodEvaluationContextProvider evaluationContextProvider;
 		private final MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext;
-		private final TemplateOperations operations;
 		
 		TemplatesQueryLookupStrategy(TemplateOperations operations, QueryMethodEvaluationContextProvider evaluationContextProvider, MappingContext<? extends TemplatePersistentEntity<?>, TemplatePersistentProperty> mappingContext) {
 			this.operations = operations;
@@ -149,12 +170,18 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 		}
 
 		@Override
-		public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, ProjectionFactory factory,
-				NamedQueries namedQueries) {
+		public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, ProjectionFactory factory, NamedQueries namedQueries) {
 
 			TemplateQueryMethod queryMethod = new TemplateQueryMethod(method, metadata, factory, mappingContext);
 			String namedQueryName = queryMethod.getNamedQueryName();
 
+			log.debug("queryMethod.getName: {}", queryMethod.getName());
+			log.debug("queryMethod: {}", queryMethod);
+			log.debug("namedQueryName: {}", namedQueryName);
+
+			System.out.println("namedQueryName: " + namedQueryName);
+			System.out.println("RepositoryInterface: " + metadata.getRepositoryInterface().getSimpleName());
+			
 			if (namedQueries.hasQuery(namedQueryName)) {
 				String namedQuery = namedQueries.getQuery(namedQueryName);
 				return new StringBasedTemplateQuery(namedQuery, queryMethod, operations, EXPRESSION_PARSER, evaluationContextProvider);

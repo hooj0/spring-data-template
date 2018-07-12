@@ -7,7 +7,7 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 
 /**
- * <b>function:</b> 转换器接口，转换属性或实体对象
+ * 转换器接口，转换属性或实体对象，可以完成复杂类型到底层类型的转换，已达到自动映射
  * @author hoojo
  * @createDate 2018年7月5日 上午11:24:38
  * @file TemplateConverter.java

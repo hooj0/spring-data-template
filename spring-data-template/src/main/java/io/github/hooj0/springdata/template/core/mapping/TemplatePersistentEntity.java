@@ -15,6 +15,10 @@ import org.springframework.data.mapping.PersistentEntity;
  */
 public interface TemplatePersistentEntity<T> extends PersistentEntity<T, TemplatePersistentProperty> {
 
+	String getIndexName();
+
+	String getIndexType();
+	
 	boolean isCompositePrimaryKey();
 	
 	String getTableName();

@@ -22,6 +22,8 @@ public abstract class AbstractTemplateRepositoryQuery implements RepositoryQuery
 
 	protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractTemplateRepositoryQuery.class);
 	
+	protected static final String COUNT_AND_EXISTS = "Manually defined query for %s cannot be a count and exists query at the same time!";
+	
 	protected TemplateQueryMethod queryMethod;
 	protected TemplateOperations operations;
 

@@ -8,7 +8,8 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 
 /**
- * <b>function:</b> 实现 EntityInformation 填充 Entity 相关信息
+ * 实现 EntityInformation 填充 Entity 相关信息。
+ * 并且可以充分利用 Converter/PersistentEntity 进行数据转换与填充。
  * @author hoojo
  * @createDate 2018年7月4日 下午5:08:33
  * @file MappingTemplateEntityInformation.java

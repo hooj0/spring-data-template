@@ -1,7 +1,5 @@
 package io.github.hooj0.springdata.template.repository;
 
-import java.io.Serializable;
-
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
 
@@ -18,7 +16,7 @@ import org.springframework.data.repository.Repository;
  * @version 1.0
  */
 @NoRepositoryBean
-public interface TemplateRepository<T, ID extends Serializable> extends Repository<T, ID> {
+public interface TemplateRepository<T, ID> extends Repository<T, ID> {
 
 	boolean invoke(String... args);
 	

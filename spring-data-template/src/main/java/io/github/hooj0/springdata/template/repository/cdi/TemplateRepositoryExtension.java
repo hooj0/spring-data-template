@@ -20,7 +20,7 @@ import org.springframework.data.repository.cdi.CdiRepositoryExtensionSupport;
 import io.github.hooj0.springdata.template.core.TemplateOperations;
 
 /**
- * <b>function:</b>
+ * 一个便携式CDI扩展，它为Spring Data Template存储库注册bean。
  * @author hoojo
  * @createDate 2018年7月4日 下午3:05:15
  * @file TemplateRepositoryExtension.java

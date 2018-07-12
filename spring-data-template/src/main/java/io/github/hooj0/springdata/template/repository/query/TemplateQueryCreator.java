@@ -13,9 +13,10 @@ import org.springframework.data.repository.query.parser.PartTree;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 import io.github.hooj0.springdata.template.core.query.Criteria;
 import io.github.hooj0.springdata.template.core.query.CriteriaQuery;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * <b>function:</b> 通过实体对象构建查询
+ * <b>function:</b> 通过实体对象构建CriteriaQuery查询
  * @author hoojo
  * @createDate 2018年7月9日 下午5:23:35
  * @file TemplateQueryCreator.java
@@ -25,6 +26,7 @@ import io.github.hooj0.springdata.template.core.query.CriteriaQuery;
  * @email hoojo_@126.com
  * @version 1.0
  */
+@Slf4j
 public class TemplateQueryCreator extends AbstractQueryCreator<CriteriaQuery, CriteriaQuery> {
 
 	private final MappingContext<?, TemplatePersistentProperty> context;
@@ -50,8 +52,8 @@ public class TemplateQueryCreator extends AbstractQueryCreator<CriteriaQuery, Cr
 		if (base == null) {
 			return create(part, iterator);
 		}
-		PersistentPropertyPath<TemplatePersistentProperty> path = context
-				.getPersistentPropertyPath(part.getProperty());
+		
+		PersistentPropertyPath<TemplatePersistentProperty> path = context.getPersistentPropertyPath(part.getProperty());
 		return base.addCriteria(from(part, new Criteria(path.toDotPath(TemplatePersistentProperty.PropertyToFieldNameConverter.INSTANCE)), iterator));
 	}
 
@@ -76,6 +78,11 @@ public class TemplateQueryCreator extends AbstractQueryCreator<CriteriaQuery, Cr
 		if (criteria == null) {
 			criteria = new Criteria();
 		}
+		
+		log.debug("part: {}", part);
+		log.debug("instance: {}", instance);
+		log.debug("parameters: {}", parameters);
+		log.debug("type: {}", type);
 		
 		switch (type) {
 			/*
@@ -112,7 +119,7 @@ public class TemplateQueryCreator extends AbstractQueryCreator<CriteriaQuery, Cr
 				return criteria.notIn(asArray(parameters.next()));
 			*/
 			default:
-				throw new RuntimeException("Illegal criteria found '" + type + "'.");
+				return criteria;
 		}
 	}
 }

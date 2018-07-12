@@ -1,6 +1,5 @@
 package io.github.hooj0.springdata.template.repository.support;
 
-import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -23,7 +22,7 @@ import lombok.NoArgsConstructor;
  * @version 1.0
  */
 @NoArgsConstructor
-public abstract class AbstractTemplateRepository<T, ID extends Serializable> implements TemplateRepository<T, ID> {
+public abstract class AbstractTemplateRepository<T, ID> implements TemplateRepository<T, ID> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTemplateRepository.class);
 	
