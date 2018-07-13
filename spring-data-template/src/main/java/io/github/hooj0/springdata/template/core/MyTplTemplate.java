@@ -245,7 +245,7 @@ public class MyTplTemplate implements TemplateOperations, ApplicationContextAwar
 	public Object queryForObject(StringQuery stringQuery, Class<?> javaType) {
 		log.debug("template run method: queryForObject({}, {})", stringQuery, javaType);
 		
-		return "object";
+		return null;
 	}
 
 	@Override
