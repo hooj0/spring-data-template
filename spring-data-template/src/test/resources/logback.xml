@@ -8,9 +8,10 @@
 	</appender>
 
 	<logger name="org.springframework" level="ERROR" />
+	<logger name="org.apache.webbeans" level="TRACE" />
 	<logger name="io.github.hooj0.springdata.template" level="DEBUG" />
 
-	<root level="ERROR">
+	<root level="TRACE">
 		<appender-ref ref="console" />
 	</root>
 </configuration>
