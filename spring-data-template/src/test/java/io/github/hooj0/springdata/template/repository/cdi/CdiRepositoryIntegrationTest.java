@@ -8,7 +8,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * <b>function:</b> CDI 依赖注入 repo 集成测试
+ * CDI 依赖注入 repo 集成测试<br/>
+ * CDI 环境依赖文件：
+ * 		beans.xml
+ * 		javax.enterprise.inject.spi.Extension
  * @author hoojo
  * @createDate 2018年7月13日 下午2:24:19
  * @file CdiRepositoryIntegrationTest.java
