@@ -1,5 +1,8 @@
 package io.github.hooj0.springdata.template.repository.support;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,11 @@ public class NumberKeyedRepositoryTest {
 	considerNestedRepositories = true, 
 	includeFilters = @Filter(pattern = ".*NumberKeyedTemplateRepo", type = FilterType.REGEX))
 	public static class Config extends AbstractTemplateConfiguration {
+		
+		@Override
+		protected Set<Class<?>> getInitialEntitySet() {
+			return Collections.singleton(User.class);
+		}
 		
 		@Bean
 		MyTplTemplate myTplTemplate() throws ClassNotFoundException {
