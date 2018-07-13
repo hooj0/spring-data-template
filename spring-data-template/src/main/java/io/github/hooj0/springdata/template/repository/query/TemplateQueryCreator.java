@@ -4,10 +4,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.cassandra.core.mapping.CassandraPersistentProperty;
-import org.springframework.data.cassandra.core.query.CriteriaDefinition;
-import org.springframework.data.cassandra.core.query.Query;
-import org.springframework.data.cassandra.repository.query.ConvertingParameterAccessor.PotentiallyConvertingIterator;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mapping.PersistentPropertyPath;
 import org.springframework.data.mapping.context.MappingContext;
@@ -15,7 +11,6 @@ import org.springframework.data.repository.query.ParameterAccessor;
 import org.springframework.data.repository.query.parser.AbstractQueryCreator;
 import org.springframework.data.repository.query.parser.Part;
 import org.springframework.data.repository.query.parser.PartTree;
-import org.springframework.util.Assert;
 
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 import io.github.hooj0.springdata.template.core.query.Criteria;
@@ -48,42 +43,6 @@ public class TemplateQueryCreator extends AbstractQueryCreator<CriteriaQuery, Cr
 		this.context = context;
 	}
 
-	@Override
-	protected CriteriaDefinition create(Part part, Iterator<Object> iterator) {
-
-		PersistentPropertyPath<CassandraPersistentProperty> path = getMappingContext().getPersistentPropertyPath(part.getProperty());
-		CassandraPersistentProperty property = path.getLeafProperty();
-
-		Assert.state(property != null && path.toDotPath() != null, "Leaf property must not be null");
-		return from(part, property, Criteria.where(path.toDotPath()), (PotentiallyConvertingIterator) iterator);
-	}
-
-	@Override
-	protected CriteriaDefinition and(Part part, CriteriaDefinition base, Iterator<Object> iterator) {
-		getQueryBuilder().and(base);
-		return create(part, iterator);
-	}
-
-	@Override
-	protected CriteriaDefinition or(CriteriaDefinition base, CriteriaDefinition criteria) {
-		throw new InvalidDataAccessApiUsageException("Cassandra does not support an OR operator");
-	}
-
-	@Override
-	protected Query complete(CriteriaDefinition criteria, Sort sort) {
-		if (criteria != null) {
-			getQueryBuilder().and(criteria);
-		}
-
-		Query query = getQueryBuilder().create(sort);
-
-		if (log.isDebugEnabled()) {
-			log.debug(String.format("Created query [%s]", query));
-		}
-
-		return query;
-	}
-	
 	@Override
 	protected CriteriaQuery create(Part part, Iterator<Object> iterator) {
 		PersistentPropertyPath<TemplatePersistentProperty> path = context.getPersistentPropertyPath(part.getProperty());
