@@ -59,6 +59,7 @@
 
 		<!-- Test -->
 		<junit.version>4.12</junit.version>
+		<cditest-owb.version>1.2.8</cditest-owb.version>
 	</properties>
 	
 	<modules>
