@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
  * @email hoojo_@126.com
  * @version 1.0
  */
-public class StringQuery {
+public class StringQuery extends AbstractQuery {
 
 	private String source;
 
@@ -32,9 +32,5 @@ public class StringQuery {
 
 	public String getSource() {
 		return source;
-	}
-
-	public void setPageable(Pageable pageable) {
-		
 	}
 }

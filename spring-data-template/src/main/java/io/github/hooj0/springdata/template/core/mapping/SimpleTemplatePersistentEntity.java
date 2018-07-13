@@ -85,10 +85,6 @@ public class SimpleTemplatePersistentEntity<T> extends BasicPersistentEntity<T, 
 		Field annotation = property.findAnnotation(Field.class);
 
 		if (annotation != null) {
-			Assert.isNull(this.parentIdProperty, "Only one field can hold a @Parent annotation");
-			Assert.isNull(this.parentType, "Only one field can hold a @Parent annotation");
-			Assert.isTrue(property.getType() == String.class, "Parent ID property should be String");
-			
 			this.parentIdProperty = property;
 			this.parentType = annotation.pattern();
 		}

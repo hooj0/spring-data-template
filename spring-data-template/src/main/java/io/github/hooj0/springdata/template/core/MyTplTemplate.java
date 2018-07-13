@@ -24,6 +24,7 @@ import io.github.hooj0.springdata.template.core.convert.TemplateConverter;
 import io.github.hooj0.springdata.template.core.mapping.SimpleTemplateMappingContext;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
+import io.github.hooj0.springdata.template.core.query.Criteria;
 import io.github.hooj0.springdata.template.core.query.CriteriaQuery;
 import io.github.hooj0.springdata.template.core.query.StringQuery;
 import lombok.extern.slf4j.Slf4j;
@@ -201,12 +202,15 @@ public class MyTplTemplate implements TemplateOperations, ApplicationContextAwar
 	@Override
 	public void delete(CriteriaQuery query, Class<?> javaType) {
 		log.debug("template run method: delete({}, {})", query, javaType);
+		
+		build(query);
 	}
 
 	@Override
 	public CloseableIterator<Object> stream(CriteriaQuery query, Class<?> entityType) {
 		log.debug("template run method: delete({}, {})", query, entityType);
 		
+		build(query);
 		return null;
 	}
 
@@ -214,6 +218,7 @@ public class MyTplTemplate implements TemplateOperations, ApplicationContextAwar
 	public int count(CriteriaQuery query, Class<?> javaType) {
 		log.debug("template run method: count({}, {})", query, javaType);
 		
+		build(query);
 		return 0;
 	}
 
@@ -221,12 +226,15 @@ public class MyTplTemplate implements TemplateOperations, ApplicationContextAwar
 	public Object queryForList(CriteriaQuery query, Class<?> javaType) {
 		log.debug("template run method: queryForList({}, {})", query, javaType);
 		
+		build(query);
 		return "list";
 	}
 
 	@Override
 	public Object queryForObject(CriteriaQuery query, Class<?> javaType) {
 		log.debug("template run method: queryForObject({}, {})", query, javaType);
+		
+		build(query);
 		
 		if (ClassUtils.isPrimitiveOrWrapper(javaType)) {
 			return 1;
@@ -240,5 +248,13 @@ public class MyTplTemplate implements TemplateOperations, ApplicationContextAwar
 		if (converter instanceof ApplicationContextAware) {
 			((ApplicationContextAware) converter).setApplicationContext(context);
 		}
+	}
+	
+	private void build(CriteriaQuery query) {
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+		System.out.println("chain: " + Statement.buildChain(query));
+		System.out.println("query: " + Statement.buildQuery(query));
+		System.out.println("filter: " + Statement.buildFilter(query));
+		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	}
 }
