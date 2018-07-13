@@ -120,56 +120,6 @@ public class MyTplTemplate implements TemplateOperations, ApplicationContextAwar
 		return null;
 	}
 	
-	public <T> boolean putMapping(Class<T> clazz) {
-		
-		TemplatePersistentEntity<T> persistentEntity = getPersistentEntityFor(clazz);
-		try {
-			TemplatePersistentProperty property = persistentEntity.getRequiredIdProperty();
-
-			log.debug("clazz: {}, indexType: {}, fieldName: {}, pType: {}", clazz, persistentEntity.getIndexType(), property.getFieldName(), persistentEntity.getParentType());
-		} catch (Exception e) {
-			throw new TemplateRootException("Failed to build mapping for " + clazz.getSimpleName(), e);
-		}
-		return true;
-	}
-
-	public <T> boolean putMapping(Class<T> clazz, Object mapping) {
-		return putMapping(getPersistentEntityFor(clazz).getIndexName(), getPersistentEntityFor(clazz).getIndexType(), mapping);
-	}
-
-	public boolean putMapping(String indexName, String type, Object mapping) {
-		Assert.notNull(indexName, "No index defined for putMapping()");
-		Assert.notNull(type, "No type defined for putMapping()");
-		
-		if (mapping instanceof String) {
-			log.debug("string mapping: {}", mapping);
-		} else if (mapping instanceof Map) {
-			log.debug("map mapping: {}", mapping);
-		} 
-		
-		return true;
-	}
-
-	public Map getMapping(String indexName, String type) {
-		Assert.notNull(indexName, "No index defined for putMapping()");
-		Assert.notNull(type, "No type defined for putMapping()");
-		
-		Map mappings = null;
-		try {
-			mappings = Maps.newHashMap();
-			
-			log.debug("Mapping indexName: {}, type: {}", indexName, type);
-		} catch (Exception e) {
-			throw new TemplateRootException("Error while getting mapping for indexName : " + indexName + " type : " + type + " " + e.getMessage());
-		}
-
-		return mappings;
-	}
-
-	public <T> Map getMapping(Class<T> clazz) {
-		return getMapping(getPersistentEntityFor(clazz).getIndexName(), getPersistentEntityFor(clazz).getIndexType());
-	}
-	
 	@Override
 	public boolean add(Object entity) {
 		log.debug("template run method: add({})", entity);
