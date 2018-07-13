@@ -2,6 +2,7 @@ package io.github.hooj0.springdata.template.repository.support;
 
 import java.math.BigInteger;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -132,6 +133,12 @@ public class AnnotationQueryRepositoryTest {
 	}
 	
 	@Test
+	public void testFindByDate() {
+		// PartTree 自动派生查询
+		repo.findByDate(new Date());
+	}
+	
+	@Test
 	public void testAsync() {
 		// PartTree 自动派生查询
 		try {
@@ -153,7 +160,7 @@ public class AnnotationQueryRepositoryTest {
 		@Score float socre;
 		@Field String name;
 		@Version Long version;
-		//int count;
+		Date date;
 	}
 	
 	interface AnnotationQueryRepo extends TemplateRepository<Person, Long> {
@@ -176,5 +183,8 @@ public class AnnotationQueryRepositoryTest {
 		CompletableFuture<Person> findOneByName(String name);
 		
 		Object findByNamedQuery(BigInteger number);
+		
+		@Query("SELECT * from Person WHERE date = ?0")
+		Person findByDate(Date date);
 	}
 }
