@@ -3,6 +3,7 @@ package io.github.hooj0.springdata.template.repository.query;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.repository.query.ParametersParameterAccessor;
+import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.repository.query.parser.PartTree;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.data.util.StreamUtils;
@@ -45,10 +46,14 @@ public class TemplatePartQuery extends AbstractTemplateRepositoryQuery {
 
 	@Override	
 	public Object execute(Object[] parameters) {
-		log.debug("part query execute parameters-vals: {}", parameters);
-		queryMethod.getParameters().forEach(item -> { log.debug("part query execute parameters-keys: {}", item); });
+		print(parameters);
+		print(queryMethod);
 		
 		ParametersParameterAccessor accessor = new ParametersParameterAccessor(queryMethod.getParameters(), parameters);
+		print(accessor);
+		print();
+		
+		log.debug("part query execute parameters-vals: {}", parameters);
 		log.debug("part query execute accessor: {}", accessor);
 		
 		CriteriaQuery query = createQuery(accessor);
@@ -109,5 +114,49 @@ public class TemplatePartQuery extends AbstractTemplateRepositoryQuery {
 		log.debug("part query createQuery: {}", accessor);
 		
 		return new TemplateQueryCreator(tree, accessor, mappingContext).createQuery();
+	}
+	
+	private void print(Object[] parameters) {
+		System.out.println("##############parameters################");
+		for (Object value : parameters) {
+			System.out.println("value: " + value);
+		}
+		System.out.println("################parameters##############");
+	}
+	
+	private void print(QueryMethod method) {
+		System.out.println("##############QueryMethod################");
+		method.getParameters().iterator().forEachRemaining(param -> {
+			System.out.println(param.getIndex() + "->" + param.getName() + "/" + param.getPlaceholder() + "/" + param.getType().getSimpleName());
+		});
+		System.out.println("##############QueryMethod################");
+	}
+	
+	private void print(ParametersParameterAccessor accessor) {
+		System.out.println("##############accessor################");
+		accessor.forEach(action -> {
+			System.out.println("accessorIter: " + action);
+		});
+		
+		accessor.getParameters().iterator().forEachRemaining(param -> {
+			System.out.println("iterParameters: " + param.getIndex() + "->" + param.getName() + "/" + param.getPlaceholder() + "/" + param.getType().getSimpleName());
+		});
+		
+		int count = accessor.getParameters().getBindableParameters().getNumberOfParameters();
+		for (int i = 0; i < count; i++) {
+			System.out.println("bindValue: " + accessor.getBindableValue(i));
+		}
+		System.out.println("##############accessor################");
+	}
+	
+	private void print() {
+		System.out.println("##############part-tree################");
+		tree.forEach(part -> {
+			part.forEach(p -> {
+				System.out.println(p.getNumberOfArguments() + "->" + p.getProperty().getSegment() + "/" + p.getProperty() + "/" + p.getProperty().toDotPath());
+			});
+		});
+		System.out.println("##############part-tree################");
+		
 	}
 }
