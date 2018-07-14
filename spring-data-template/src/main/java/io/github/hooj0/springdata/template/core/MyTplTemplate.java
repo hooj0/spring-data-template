@@ -26,6 +26,7 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 import io.github.hooj0.springdata.template.core.query.Criteria;
 import io.github.hooj0.springdata.template.core.query.CriteriaQuery;
+import io.github.hooj0.springdata.template.core.query.CriteriaQueryProcessor;
 import io.github.hooj0.springdata.template.core.query.StringQuery;
 import lombok.extern.slf4j.Slf4j;
 
@@ -252,9 +253,10 @@ public class MyTplTemplate implements TemplateOperations, ApplicationContextAwar
 	
 	private void build(CriteriaQuery query) {
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("chain: " + Statement.buildChain(query));
-		System.out.println("query: " + Statement.buildQuery(query));
-		System.out.println("filter: " + Statement.buildFilter(query));
+		System.out.println(new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria()));
+		//System.out.println("chain: " + Statement.buildChain(query));
+		//System.out.println("query: " + Statement.buildQuery(query));
+		//System.out.println("filter: " + Statement.buildFilter(query));
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	}
 }
