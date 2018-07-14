@@ -24,11 +24,11 @@ import io.github.hooj0.springdata.template.core.TemplateOperations;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity;
 import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentProperty;
 import io.github.hooj0.springdata.template.repository.TemplateRepository;
-import io.github.hooj0.springdata.template.repository.query.PartTreeTemplateQuery;
-import io.github.hooj0.springdata.template.repository.query.StringBasedTemplateQuery;
-import io.github.hooj0.springdata.template.repository.query.TemplatePartQuery;
 import io.github.hooj0.springdata.template.repository.query.TemplateQueryMethod;
-import io.github.hooj0.springdata.template.repository.query.TemplateStringQuery;
+import io.github.hooj0.springdata.template.repository.query.complex.PartTreeTemplateQuery;
+import io.github.hooj0.springdata.template.repository.query.complex.StringBasedTemplateQuery;
+import io.github.hooj0.springdata.template.repository.query.simple.TemplatePartQuery;
+import io.github.hooj0.springdata.template.repository.query.simple.TemplateStringQuery;
 import lombok.extern.slf4j.Slf4j;
 
 /**
