@@ -460,7 +460,7 @@ public class Criteria {
 		return this.boost;
 	}
 
-	static class SimpleField implements Field {
+	public static class SimpleField implements Field {
 
 		private final String name;
 
@@ -479,7 +479,7 @@ public class Criteria {
 		}
 	}
 	
-	static class OrCriteria extends Criteria {
+	public static class OrCriteria extends Criteria {
 
 		public OrCriteria() {
 			super();
@@ -507,8 +507,19 @@ public class Criteria {
 		}
 	}
 
-	public enum OperationKey {
-		EQUALS, CONTAINS, STARTS_WITH, ENDS_WITH, EXPRESSION, BETWEEN, FUZZY, IN, NOT_IN, WITHIN, BBOX, NEAR, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL;
+	public static enum OperationKey {
+		EQUALS("="), CONTAINS("="), STARTS_WITH("like %"), ENDS_WITH("like %%"), 
+		EXPRESSION("like %%"), BETWEEN("between "), FUZZY("fzz"), IN("in"), NOT_IN("not in"), 
+		WITHIN("with in"), BBOX(" == "), NEAR(" != "), LESS("<"), LESS_EQUAL(">="), GREATER(">"), GREATER_EQUAL("<=");
+		
+		String op;
+		OperationKey(String op) {
+			this.op = op;
+		}
+		
+		public String toString() {
+			return op;
+		}
 	}
 
 	public static class CriteriaEntry {
