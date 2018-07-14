@@ -7,7 +7,7 @@ import io.github.hooj0.springdata.template.core.mapping.TemplatePersistentEntity
 /**
  * Implementation of {@link TemplateEntityMetadata} based on the type and {@link TemplatePersistentEntity}.
  */
-class SimpleTemplateEntityMetadata<T> implements TemplateEntityMetadata<T> {
+public class SimpleTemplateEntityMetadata<T> implements TemplateEntityMetadata<T> {
 
 	private final TemplatePersistentEntity<?> entity;
 
