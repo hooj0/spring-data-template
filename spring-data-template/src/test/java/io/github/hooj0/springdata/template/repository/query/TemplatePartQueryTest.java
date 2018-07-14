@@ -30,12 +30,13 @@ import io.github.hooj0.springdata.template.annotations.Field;
 import io.github.hooj0.springdata.template.annotations.Model;
 import io.github.hooj0.springdata.template.annotations.Query;
 import io.github.hooj0.springdata.template.core.MyTplTemplate;
-import io.github.hooj0.springdata.template.core.Statement;
 import io.github.hooj0.springdata.template.core.TemplateOperations;
 import io.github.hooj0.springdata.template.core.mapping.SimpleTemplateMappingContext;
 import io.github.hooj0.springdata.template.core.query.CriteriaQuery;
+import io.github.hooj0.springdata.template.core.query.CriteriaQueryProcessor;
 import io.github.hooj0.springdata.template.enums.FieldType;
 import io.github.hooj0.springdata.template.repository.TemplateRepository;
+import io.github.hooj0.springdata.template.repository.query.simple.TemplatePartQuery;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -85,7 +86,7 @@ public class TemplatePartQueryTest {
 
 	@Test // DATACASS-7
 	public void shouldDeriveAndQuery() {
-		build(deriveQueryFromMethod("findByFirstnameAndLastnameAndNickname", "foo", "bar", "see"));
+		build(deriveQueryFromMethod("findByFirstnameAndLastnameAndNicknameOrLastname", "foo", "bar", "see", "xxx"));
 		build(deriveQueryFromMethod("findByFirstnameOrLastnameOrNickname", "foo", "bar", "daa"));
 		
 		//assertThat(query).isEqualTo("SELECT * FROM person WHERE firstname='foo' AND lastname='bar';");
@@ -142,9 +143,10 @@ public class TemplatePartQueryTest {
 
 	private void build(CriteriaQuery query) {
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("chain: " + Statement.buildChain(query));
-		System.out.println("query: " + Statement.buildQuery(query));
-		System.out.println("filter: " + Statement.buildFilter(query));
+		System.out.println(new CriteriaQueryProcessor().createQueryFromCriteria(query.getCriteria()));
+		//System.out.println("chain: " + Statement.buildChain(query));
+		//System.out.println("query: " + Statement.buildQuery(query));
+		//System.out.println("filter: " + Statement.buildFilter(query));
 		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 	}
 	
@@ -202,8 +204,8 @@ public class TemplatePartQueryTest {
 		return partTreeQuery.createQuery(accessor);
 	}
 
-	private TemplatePartQuery createQueryForMethod(Class<?> repositoryInterface, String methodName,
-			Class<?>... paramTypes) {
+	@SuppressWarnings("unchecked")
+	private TemplatePartQuery createQueryForMethod(Class<?> repositoryInterface, String methodName, Class<?>... paramTypes) {
 		Class<?>[] userTypes = Arrays.stream(paramTypes)//
 				.map(it -> it.getName().contains("Mockito") ? it.getSuperclass() : it)//
 				.toArray(size -> new Class<?>[size]);
@@ -223,6 +225,7 @@ public class TemplatePartQueryTest {
 	@NoArgsConstructor
 	class GroupKey implements Serializable {
 
+		private static final long serialVersionUID = 1L;
 		@Field(type = FieldType.Ip, index = true) private String groupname;
 		@Field(pattern = "sdflsdf") private String hashPrefix;
 		@Field(pattern = "XXxxxx") private String username;
@@ -299,7 +302,7 @@ public class TemplatePartQueryTest {
 		Person findTop3By();
 
 		Person findByFirstnameAndLastname(String firstname, String lastname);
-		Person findByFirstnameAndLastnameAndNickname(String firstname, String lastname, String see);
+		Person findByFirstnameAndLastnameAndNicknameOrLastname(String firstname, String lastname, String see, String x);
 		Person findByFirstnameOrLastnameOrNickname(String firstname, String lastname, String daa);
 
 		Person findPersonByFirstnameAndLastname(String firstname, String lastname);
