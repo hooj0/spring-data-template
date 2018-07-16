@@ -1,7 +1,7 @@
 # Spring Data Template Framework
-`Spring Data Framework` 的扩展或使用模板脚手架，这是一种二次开发工具。按照本模板可以简单的套取模板中的文件，开发自己的`Spring Data` 框架。
+`Spring Data Framework` 的扩展或使用模板脚手架，这是一种二次开发工具。按照本模板可以简单的套取模板中的文件，开发自己的`Spring Data` 框架。*本案例旨在用于学习和交流，不能用于实际生产。*
 
-切换中文版, Swith English
+[中文版](readme_zh.md), [English version](README.md)
 
 # 使用 spring-data-template
 简要描述如何应用Spring数据模板来开发自己的`Spring Data`框架。
@@ -38,7 +38,7 @@
 		+ `SimpleTemplateMappingContext` 映射上下文，提供持久化实体和属性的构建方法
 		+ `SimpleTemplatePersistentEntity` 持久化实体对象接口实现
 		+ `SimpleTemplatePersistentProperty` 持久化实体对象属性接口实现
-	- **query**：字符串查询、注解查询、CRUD操作的**条件**的核心实现		
+			**query**：字符串查询、注解查询、CRUD操作的**条件**的核心实现		
 	- `MyTplTemplate` 模板类，完成CRUD操作，提供给 `repository` 的底层实现
 	- `TemplateOperations` 模板类接口，完成CRUD操作的定义
 + **enums**：枚举配置类
