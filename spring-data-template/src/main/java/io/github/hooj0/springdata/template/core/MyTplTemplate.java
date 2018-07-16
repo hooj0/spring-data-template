@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.mapping.Person;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.util.Assert;
 
