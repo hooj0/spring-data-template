@@ -260,6 +260,7 @@ public class TemplatePartQueryTest {
 	@NoArgsConstructor
 	public class Person {
 
+		private String id;
 		@Field private String lastname;
 
 		@Field private String firstname;

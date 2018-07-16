@@ -69,7 +69,6 @@ public class TemplateStringQuery extends AbstractTemplateRepositoryQuery {
 			}
 			return operations.queryForList(stringQuery, queryMethod.getEntityInformation().getJavaType());
 		} else if (queryMethod.hasAnnotatedQuery() && StringUtils.contains(queryMethod.getNamedQueryName(), "count")) {
-			System.out.println("--->" + queryMethod.getNamedQueryName());
 			return operations.count(null, queryMethod.getEntityInformation().getJavaType());
 		}
 

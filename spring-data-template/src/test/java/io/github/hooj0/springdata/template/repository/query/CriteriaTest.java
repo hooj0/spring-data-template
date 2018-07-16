@@ -8,7 +8,7 @@ import io.github.hooj0.springdata.template.core.query.CriteriaQueryProcessor;
 import io.github.hooj0.springdata.template.core.query.StatementPrint;
 
 /**
- * <b>function:</b>
+ * <b>function:</b> CriteriaTest
  * @author hoojo
  * @createDate 2018年7月14日 上午11:07:22
  * @file CriteriaTest.java

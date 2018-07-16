@@ -9,8 +9,18 @@ import org.springframework.util.Assert;
 
 import io.github.hooj0.springdata.template.core.query.Criteria.OperationKey;
 
+/**
+ * <b>function:</b>Criteria Query Processor 构建条件查询
+ * @author hoojo
+ * @createDate 2018年7月16日 上午9:37:34
+ * @file CriteriaQueryProcessor.java
+ * @package io.github.hooj0.springdata.template.core.query
+ * @project spring-data-template
+ * @blog http://hoojo.cnblogs.com
+ * @email hoojo_@126.com
+ * @version 1.0
+ */
 public class CriteriaQueryProcessor {
-
 
 	public String createQueryFromCriteria(Criteria criteria) {
 		if (criteria == null) {
@@ -107,7 +117,7 @@ public class CriteriaQueryProcessor {
 	}
 
 
-	@SuppressWarnings({ "unchecked", "incomplete-switch" })
+	@SuppressWarnings({ "unchecked" })
 	private String processCriteriaEntry(Criteria.CriteriaEntry entry,/* OperationKey key, Object value,*/ String fieldName) {
 		Object value = entry.getValue();
 		if (value == null) {
