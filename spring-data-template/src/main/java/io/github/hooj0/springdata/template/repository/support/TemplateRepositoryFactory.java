@@ -75,6 +75,7 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 
 	@Override
 	protected Object getTargetRepository(RepositoryInformation metadata) {
+		// 创建repo目标对象，传入构造参数值
 		return getTargetRepositoryViaReflection(metadata, getEntityInformation(metadata.getDomainType()), operations);
 	}
 
@@ -117,9 +118,12 @@ public class TemplateRepositoryFactory extends RepositoryFactorySupport {
 	protected Optional<QueryLookupStrategy> getQueryLookupStrategy(Key key, QueryMethodEvaluationContextProvider evaluationContextProvider) {
 		log.debug("key: {}", key);
 		
-		//return
-		Optional.of(new TemplatesQueryLookupStrategy(operations, evaluationContextProvider, operations.getTemplateConverter().getMappingContext()));
-		return Optional.of(new TemplateQueryLookupStrategy(operations.getTemplateConverter().getMappingContext()));
+		// EnableTemplateRepositories 配置中 queryLookupStrategy()
+		if (key == Key.CREATE_IF_NOT_FOUND) {
+			return Optional.of(new TemplateQueryLookupStrategy(operations.getTemplateConverter().getMappingContext()));
+		} else {
+			return Optional.of(new TemplatesQueryLookupStrategy(operations, evaluationContextProvider, operations.getTemplateConverter().getMappingContext()));
+		}
 	}
 
 	/**
